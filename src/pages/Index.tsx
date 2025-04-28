@@ -5,6 +5,7 @@ import Dashboard from '@/components/dashboard/Dashboard';
 import { Button } from '@/components/ui/button';
 import { Toaster } from '@/components/ui/sonner';
 import { useToast } from '@/hooks/use-toast';
+import { RefreshCw } from 'lucide-react';
 
 const Index = () => {
   const { toast } = useToast();
@@ -27,8 +28,9 @@ const Index = () => {
           <Button 
             onClick={handleRefresh} 
             variant="outline" 
-            className="mt-2"
+            className="mt-2 flex items-center gap-2"
           >
+            <RefreshCw className="h-4 w-4" />
             Refresh Data
           </Button>
         </div>

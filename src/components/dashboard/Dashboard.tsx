@@ -1,10 +1,13 @@
+
 import React, { useState, useEffect } from 'react';
+import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import DashboardSummary from './DashboardSummary';
 import UptimeMonitorCard from './UptimeMonitorCard';
 import ServiceStatusCard from './ServiceStatusCard';
 import DeviceStatusCard from './DeviceStatusCard';
 import AlertCard from './AlertCard';
 import EmailCard from './EmailCard';
+import { Server, Cloud, Rss } from 'lucide-react';
 
 // Mock data for initial rendering
 const mockData = {
@@ -174,35 +177,54 @@ const Dashboard: React.FC = () => {
       
       <DashboardSummary data={summaryData} />
       
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <UptimeMonitorCard 
-          title={firstMonitor.friendly_name}
-          monitorsDown={firstMonitor.monitor_down}
-          monitorsTotal={firstMonitor.monitor_total}
-          monitors={firstMonitor.monitors_id}
-        />
+      <Tabs defaultValue="infrastructure" className="w-full">
+        <TabsList className="grid w-full grid-cols-2 mb-6">
+          <TabsTrigger value="infrastructure" className="flex items-center gap-2">
+            <Server className="h-4 w-4" />
+            <span>Infrastructure</span>
+          </TabsTrigger>
+          <TabsTrigger value="services" className="flex items-center gap-2">
+            <Rss className="h-4 w-4" />
+            <span>Services & Communication</span>
+          </TabsTrigger>
+        </TabsList>
         
-        <ServiceStatusCard 
-          title="External Services"
-          services={servicesData}
-        />
+        <TabsContent value="infrastructure" className="space-y-6">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <UptimeMonitorCard 
+              title={firstMonitor.friendly_name}
+              monitorsDown={firstMonitor.monitor_down}
+              monitorsTotal={firstMonitor.monitor_total}
+              monitors={firstMonitor.monitors_id}
+            />
+            
+            <DeviceStatusCard 
+              title={data.aruba.data[0].site_name}
+              totalDevices={data.aruba.data[0].total_devices}
+              problemDevices={data.aruba.data[0].devices_problem}
+            />
+            
+            <AlertCard 
+              title="Active Alerts"
+              alerts={data.atera.alerts}
+            />
+          </div>
+        </TabsContent>
         
-        <DeviceStatusCard 
-          title={data.aruba.data[0].site_name}
-          totalDevices={data.aruba.data[0].total_devices}
-          problemDevices={data.aruba.data[0].devices_problem}
-        />
-        
-        <EmailCard 
-          title="Recent Emails"
-          emails={data.gmail}
-        />
-      </div>
-      
-      <AlertCard 
-        title="Active Alerts"
-        alerts={data.atera.alerts}
-      />
+        <TabsContent value="services" className="space-y-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <ServiceStatusCard 
+              title="External Services"
+              services={servicesData}
+            />
+            
+            <EmailCard 
+              title="Recent Emails"
+              emails={data.gmail}
+            />
+          </div>
+        </TabsContent>
+      </Tabs>
     </div>
   );
 };
