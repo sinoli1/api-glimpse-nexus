@@ -73,6 +73,11 @@ const AlertCard: React.FC<AlertCardProps> = ({ title, alerts, className }) => {
         {alertsArray.map((alert) => {
           const latestIncident = alert.incidents && alert.incidents[0];
           const isServerDown = alert.Title === "Machine status unknown";
+          const isCritical = alert.Severity.toLowerCase() === 'critical' || isServerDown;
+          // Create custom title from DeviceName and CustomerName
+          const displayTitle = alert.DeviceName && alert.CustomerName 
+            ? `${alert.DeviceName} | ${alert.CustomerName}`
+            : alert.Title;
           
           return (
             <div 
@@ -85,21 +90,27 @@ const AlertCard: React.FC<AlertCardProps> = ({ title, alerts, className }) => {
             >
               <div className="flex justify-between items-start mb-1">
                 <div className="flex items-center gap-1">
-                  {isServerDown && <AlertCircle className="h-4 w-4 text-status-critical" />}
-                  <span className={cn("font-bold", isServerDown && "text-status-critical")}>{alert.Title}</span>
+                  {isCritical && <AlertCircle className="h-4 w-4 text-status-critical" />}
+                  <span className={cn(
+                    "font-bold", 
+                    isCritical && "text-status-critical"
+                  )}>
+                    {displayTitle}
+                  </span>
                 </div>
-                <span className="text-xs bg-secondary py-0.5 px-2 rounded-full">
+                <span className={cn(
+                  "text-xs py-0.5 px-2 rounded-full",
+                  isCritical ? "bg-red-50 text-red-700" : "bg-secondary"
+                )}>
                   {alert.Severity}
                 </span>
               </div>
-              <p className="text-sm text-muted-foreground mb-1">{alert.AlertMessage}</p>
-              {(alert.DeviceName || alert.CustomerName) && (
-                <p className="text-xs text-muted-foreground mb-2">
-                  {alert.DeviceName && <span className="font-medium">{alert.DeviceName}</span>}
-                  {alert.DeviceName && alert.CustomerName && <span> | </span>}
-                  {alert.CustomerName && <span>{alert.CustomerName}</span>}
-                </p>
-              )}
+              <p className={cn(
+                "text-sm mb-1",
+                isCritical ? "text-red-600" : "text-muted-foreground"
+              )}>
+                {alert.AlertMessage}
+              </p>
               {latestIncident && (
                 <div className="text-xs text-muted-foreground">
                   <span>Created: {formatDate(latestIncident.created)}</span>
