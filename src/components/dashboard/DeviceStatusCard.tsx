@@ -4,13 +4,15 @@ import DashboardCard from './DashboardCard';
 import StatusBadge from './StatusBadge';
 import { cn } from '@/lib/utils';
 import { Progress } from '@/components/ui/progress';
-import { AlertCircle } from 'lucide-react';
+import { AlertCircle, Clock } from 'lucide-react';
 
 interface DeviceProps {
   device_name: string;
   status: string;
   model?: string;
   ip_address?: string;
+  seconds_since_last_communication?: number;
+  last_communication_datetime?: string;
 }
 
 interface DeviceStatusCardProps {
@@ -28,6 +30,23 @@ const DeviceStatusCard: React.FC<DeviceStatusCardProps> = ({
 }) => {
   const healthyPercentage = ((totalDevices - problemDevices.length) / totalDevices) * 100;
   const isAllDown = totalDevices > 0 && problemDevices.length === totalDevices;
+  
+  // Function to format downtime duration
+  const formatDowntime = (seconds: number | undefined): string => {
+    if (!seconds) return 'Unknown';
+    
+    const days = Math.floor(seconds / 86400);
+    const hours = Math.floor((seconds % 86400) / 3600);
+    const minutes = Math.floor((seconds % 3600) / 60);
+    
+    if (days > 0) {
+      return `${days}d ${hours}h ${minutes}m`;
+    } else if (hours > 0) {
+      return `${hours}h ${minutes}m`;
+    } else {
+      return `${minutes}m`;
+    }
+  };
   
   return (
     <DashboardCard 
@@ -63,6 +82,17 @@ const DeviceStatusCard: React.FC<DeviceStatusCardProps> = ({
             <div className="flex flex-col">
               <span className="font-medium">{device.device_name}</span>
               <span className="text-xs text-muted-foreground">{device.model || ''} {device.ip_address || ''}</span>
+              {device.seconds_since_last_communication && (
+                <div className="flex items-center gap-1 text-xs text-red-600 mt-1">
+                  <Clock className="h-3 w-3" />
+                  <span>Down for {formatDowntime(device.seconds_since_last_communication)}</span>
+                </div>
+              )}
+              {device.last_communication_datetime && !device.seconds_since_last_communication && (
+                <div className="text-xs text-muted-foreground mt-1">
+                  Last seen: {device.last_communication_datetime}
+                </div>
+              )}
             </div>
             <StatusBadge status={device.status} />
           </div>

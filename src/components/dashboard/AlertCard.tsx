@@ -92,8 +92,8 @@ const AlertCard: React.FC<AlertCardProps> = ({ title, alerts, className }) => {
                 <div className="flex items-center gap-1">
                   {isCritical && <AlertCircle className="h-4 w-4 text-status-critical" />}
                   <span className={cn(
-                    "font-bold", 
-                    isCritical && "text-status-critical"
+                    "font-bold text-status-critical",
+                    isCritical ? "text-status-critical" : ""
                   )}>
                     {displayTitle}
                   </span>
@@ -105,10 +105,7 @@ const AlertCard: React.FC<AlertCardProps> = ({ title, alerts, className }) => {
                   {alert.Severity}
                 </span>
               </div>
-              <p className={cn(
-                "text-sm mb-1",
-                isCritical ? "text-red-600" : "text-muted-foreground"
-              )}>
+              <p className="text-sm mb-1 text-muted-foreground">
                 {alert.AlertMessage}
               </p>
               {latestIncident && (
