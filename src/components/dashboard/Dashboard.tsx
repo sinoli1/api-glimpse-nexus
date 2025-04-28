@@ -150,7 +150,7 @@ const Dashboard: React.FC = () => {
       total: data.uptime.monitors.reduce((acc, monitor) => acc + monitor.monitor_total, 0),
       down: data.uptime.monitors.reduce((acc, monitor) => acc + monitor.monitor_down, 0)
     },
-    emailsCount: Object.keys(data.gmail).length,
+    emailsCount: Object.values(data.gmail).filter(email => email.Estado?.toLowerCase() === 'failed').length,
     alertsCount: Object.keys(data.atera.alerts).length,
     devicesProblems: data.aruba.data.reduce((acc, site) => acc + site.total_devices_problem, 0),
     servicesDown: Object.values(data.rss.services).filter(status => status !== 'Up').length,

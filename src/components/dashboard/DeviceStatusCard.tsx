@@ -4,6 +4,7 @@ import DashboardCard from './DashboardCard';
 import StatusBadge from './StatusBadge';
 import { cn } from '@/lib/utils';
 import { Progress } from '@/components/ui/progress';
+import { AlertCircle } from 'lucide-react';
 
 interface DeviceProps {
   device_name: string;
@@ -26,12 +27,17 @@ const DeviceStatusCard: React.FC<DeviceStatusCardProps> = ({
   className 
 }) => {
   const healthyPercentage = ((totalDevices - problemDevices.length) / totalDevices) * 100;
+  const isAllDown = totalDevices > 0 && problemDevices.length === totalDevices;
   
   return (
     <DashboardCard 
       title={title}
       description={`${problemDevices.length} of ${totalDevices} devices with issues`}
-      className={cn('h-full', className)}
+      className={cn(
+        'h-full', 
+        isAllDown ? 'border-2 border-status-critical' : '',
+        className
+      )}
       footer={
         <div className="w-full">
           <div className="flex justify-between text-xs mb-1">
@@ -42,6 +48,12 @@ const DeviceStatusCard: React.FC<DeviceStatusCardProps> = ({
         </div>
       }
     >
+      {isAllDown && (
+        <div className="mb-3 flex items-center gap-2 p-2 bg-red-50 text-red-700 rounded-md">
+          <AlertCircle className="h-4 w-4" />
+          <span className="font-medium text-sm">Critical: All devices down!</span>
+        </div>
+      )}
       <div className="space-y-3">
         {problemDevices.map((device) => (
           <div 
