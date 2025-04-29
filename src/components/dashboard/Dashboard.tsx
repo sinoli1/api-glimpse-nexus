@@ -40,6 +40,7 @@ interface AteraAlert {
   DeviceName: string;
   Severity: string;
   Title: string;
+  incidents?: { created: string; resolved: string | null }[];
 }
 
 interface ArubaDevice {
@@ -180,6 +181,15 @@ const Dashboard = forwardRef<DashboardRef>((props, ref) => {
   // For the first monitor in the uptime data
   const firstMonitor = data.uptime.monitors?.[0];
 
+  // Transform Atera alerts to match AlertCard's expected format
+  const transformedAlerts = Object.entries(data.atera?.alerts || {}).reduce((acc, [id, alert]) => {
+    acc[id] = {
+      ...alert,
+      incidents: alert.incidents || [{ created: new Date().toISOString(), resolved: null }]
+    };
+    return acc;
+  }, {} as Record<string, AteraAlert>);
+
   return (
     <div className="w-full space-y-6">
       {error && (
@@ -229,7 +239,7 @@ const Dashboard = forwardRef<DashboardRef>((props, ref) => {
             
             <AlertCard 
               title="Active Alerts"
-              alerts={data.atera?.alerts || {}}
+              alerts={transformedAlerts}
             />
           </div>
         </TabsContent>
