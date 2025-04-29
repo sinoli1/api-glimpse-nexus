@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useRef } from 'react';
 import DashboardHeader from '@/components/layout/DashboardHeader';
 import Dashboard from '@/components/dashboard/Dashboard';
 import { Button } from '@/components/ui/button';
@@ -9,13 +9,18 @@ import { RefreshCw } from 'lucide-react';
 
 const Index = () => {
   const { toast } = useToast();
+  const dashboardRef = useRef<{ fetchData?: () => Promise<void> }>(null);
   
   const handleRefresh = () => {
     toast({
       title: "Dashboard refreshing",
       description: "Fetching the latest data from all APIs..."
     });
-    // In a real app, this would trigger a refresh of the data
+    
+    // Call the fetchData method on the Dashboard component
+    if (dashboardRef.current && dashboardRef.current.fetchData) {
+      dashboardRef.current.fetchData();
+    }
   };
   
   return (
@@ -35,7 +40,7 @@ const Index = () => {
           </Button>
         </div>
         
-        <Dashboard />
+        <Dashboard ref={dashboardRef} />
       </div>
     </div>
   );
