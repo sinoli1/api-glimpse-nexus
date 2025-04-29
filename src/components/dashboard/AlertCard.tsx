@@ -16,7 +16,7 @@ interface AlertProps {
   CustomerName?: string;
   DeviceName?: string;
   Severity: string;
-  incidents: IncidentProps[];
+  incidents?: IncidentProps[]; // Changed to optional to match AteraAlert
 }
 
 interface AlertCardProps {
