@@ -1,7 +1,7 @@
 
 import React, { useRef } from 'react';
 import DashboardHeader from '@/components/layout/DashboardHeader';
-import Dashboard from '@/components/dashboard/Dashboard';
+import Dashboard, { DashboardRef } from '@/components/dashboard/Dashboard';
 import { Button } from '@/components/ui/button';
 import { Toaster } from '@/components/ui/sonner';
 import { useToast } from '@/hooks/use-toast';
@@ -9,7 +9,7 @@ import { RefreshCw } from 'lucide-react';
 
 const Index = () => {
   const { toast } = useToast();
-  const dashboardRef = useRef<{ fetchData?: () => Promise<void> }>(null);
+  const dashboardRef = useRef<DashboardRef>(null);
   
   const handleRefresh = () => {
     toast({
@@ -18,7 +18,7 @@ const Index = () => {
     });
     
     // Call the fetchData method on the Dashboard component
-    if (dashboardRef.current && dashboardRef.current.fetchData) {
+    if (dashboardRef.current) {
       dashboardRef.current.fetchData();
     }
   };

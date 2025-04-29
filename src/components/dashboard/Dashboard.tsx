@@ -13,12 +13,76 @@ import { useToast } from '@/hooks/use-toast';
 // Base API URL
 const API_BASE_URL = 'http://10.200.0.189:5000';
 
-interface DashboardRef {
+interface EmailData {
+  Remitente: string;
+  Destinatario: string;
+  FechaEnvio: string;
+  Estado: string;
+  Cuerpo: string;
+}
+
+interface UptimeMonitor {
+  friendly_name: string;
+  monitor_down: number;
+  monitor_total: number;
+  monitors_id: Record<string, {
+    friendly_name: string;
+    status: string;
+    url: string;
+  }>;
+}
+
+interface AteraAlert {
+  AlertCategoryID: string;
+  AlertMessage: string;
+  CustomerName: string;
+  DeviceGuid: string;
+  DeviceName: string;
+  Severity: string;
+  Title: string;
+}
+
+interface ArubaDevice {
+  device_name: string;
+  status: string;
+  model?: string;
+  ip_address?: string;
+  seconds_since_last_communication?: number;
+  last_communication_datetime?: string;
+}
+
+interface ArubaData {
+  devices_problem: ArubaDevice[];
+  site_id: string;
+  site_name: string;
+  total_devices: number;
+  total_devices_problem: number;
+}
+
+interface DashboardData {
+  uptime: {
+    monitors: UptimeMonitor[];
+  };
+  gmail: Record<string, EmailData>;
+  atera: {
+    alerts: Record<string, AteraAlert>;
+  };
+  aruba: {
+    data: ArubaData[];
+    timestamp: string;
+  };
+  rss: {
+    services: Record<string, string>;
+    timestamp: string;
+  };
+}
+
+export interface DashboardRef {
   fetchData: () => Promise<void>;
 }
 
 const Dashboard = forwardRef<DashboardRef>((props, ref) => {
-  const [data, setData] = useState({
+  const [data, setData] = useState<DashboardData>({
     uptime: { monitors: [] },
     gmail: {},
     atera: { alerts: {} },
@@ -99,7 +163,7 @@ const Dashboard = forwardRef<DashboardRef>((props, ref) => {
       total: data.uptime.monitors?.reduce((acc, monitor) => acc + monitor.monitor_total, 0) || 0,
       down: data.uptime.monitors?.reduce((acc, monitor) => acc + monitor.monitor_down, 0) || 0
     },
-    emailsCount: Object.values(data.gmail || {}).filter(email => email.Estado?.toLowerCase() === 'failed').length,
+    emailsCount: Object.values(data.gmail || {}).filter(email => (email as EmailData).Estado?.toLowerCase() === 'failed').length,
     alertsCount: Object.keys(data.atera?.alerts || {}).length,
     devicesProblems: data.aruba?.data?.reduce((acc, site) => acc + site.total_devices_problem, 0) || 0,
     servicesDown: Object.values(data.rss?.services || {}).filter(status => status !== 'Up').length,
